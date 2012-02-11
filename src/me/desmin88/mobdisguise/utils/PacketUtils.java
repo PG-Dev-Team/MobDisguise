@@ -37,6 +37,18 @@ public class PacketUtils {
 
         }
     }
+    
+    public void undisguiseOthers(Player seer) {
+    	for (Player person : Bukkit.getServer().getOnlinePlayers()) {
+    		if (person != seer) {
+	    		if (MobDisguise.disList.contains(person.getName())) {
+	    			undisguiseToSingle(person, seer);
+	    		} else if (MobDisguise.playerdislist.contains(person.getName())) {
+	    			undisguisep2pToSingle(person, seer);
+	    		}
+    		}
+    	}
+    }
 
     public void undisguiseToAll(Player p1) {
         // Make packets out of loop!
@@ -55,6 +67,15 @@ public class PacketUtils {
             ((CraftPlayer) p2).getHandle().netServerHandler.sendPacket(p20);
         }
     }
+    
+    public void undisguiseToSingle(Player toUnDisguise, Player witness) {
+    	CraftPlayer p22 = (CraftPlayer) toUnDisguise;
+        Packet29DestroyEntity p29 = new Packet29DestroyEntity(p22.getEntityId());
+        Packet20NamedEntitySpawn p20 = new Packet20NamedEntitySpawn(p22.getHandle());
+        
+        ((CraftPlayer) witness).getHandle().netServerHandler.sendPacket(p29);
+        ((CraftPlayer) witness).getHandle().netServerHandler.sendPacket(p20);
+    }
 
     public void disguiseToAll(Player p1) {
         // Make packets out of loop!
@@ -68,6 +89,11 @@ public class PacketUtils {
             }
             ((CraftPlayer) p2).getHandle().netServerHandler.sendPacket(p24);
         }
+    }
+    
+    public void disguiseToSingle(Player toDisguise, Player witness) {
+    	Packet24MobSpawn p24 = packetMaker(toDisguise, MobDisguise.playerMobDis.get(toDisguise.getName()).mob.id);
+    	((CraftPlayer) witness).getHandle().netServerHandler.sendPacket(p24);
     }
 
     // Begin code for p2p disguising
@@ -92,8 +118,8 @@ public class PacketUtils {
             ((CraftPlayer) p1).getHandle().netServerHandler.sendPacket(p20);
         }
     }
-
-    public void undisguisep2pToAll(Player p) {
+    
+   public void undisguisep2pToAll(Player p) {
         p.setDisplayName(p.getName());
         Packet20NamedEntitySpawn p20 = packetMaker(p, p.getName());
         Packet29DestroyEntity p29 = new Packet29DestroyEntity(p.getEntityId()); // Must
@@ -110,6 +136,14 @@ public class PacketUtils {
             ((CraftPlayer) p1).getHandle().netServerHandler.sendPacket(p20);
         }
     }
+   
+   public void undisguisep2pToSingle(Player toUnDisguise, Player witness) {
+	// This does not set their name back, it merely shows their normal skin
+	   Packet20NamedEntitySpawn p20 = packetMaker(toUnDisguise, toUnDisguise.getName());
+       Packet29DestroyEntity p29 = new Packet29DestroyEntity(toUnDisguise.getEntityId());
+       ((CraftPlayer) witness).getHandle().netServerHandler.sendPacket(p29);
+       ((CraftPlayer) witness).getHandle().netServerHandler.sendPacket(p20);
+   }
 
     public Packet20NamedEntitySpawn packetMaker(Player p, String name) {
         Location loc = p.getLocation();

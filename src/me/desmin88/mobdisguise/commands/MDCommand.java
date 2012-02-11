@@ -9,6 +9,8 @@ import me.desmin88.mobdisguise.utils.Disguise;
 import me.desmin88.mobdisguise.utils.Disguise.MobType;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -69,6 +71,12 @@ public class MDCommand implements CommandExecutor {
                 MobDisguise.playerEntIds.remove(Integer.valueOf(s.getEntityId()));
                 s.sendMessage(MobDisguise.pref + "You have been changed back to human form!");
                 return true;
+            }
+            
+            if (args[0].equalsIgnoreCase("show")) {
+            	MobDisguise.pu.undisguiseOthers(s);
+            	s.sendMessage(ChatColor.GOLD + "Other players have been undisguised until the next disguise update interval.");
+            	return true;
             }
 
             if (args[0].equalsIgnoreCase("baby")) {
@@ -195,6 +203,10 @@ public class MDCommand implements CommandExecutor {
                 if (!MobDisguise.cfg.getBoolean("BlackList." + mobtype, true)) {
                     s.sendMessage(MobDisguise.pref + "This mob type has been restricted!");
                     return true;
+                }
+                if (s.getItemInHand().getType() == Material.FISHING_ROD) {
+                	s.sendMessage(MobDisguise.pref + "You cannot disguise with a fishing rod in hand.");
+                	return true;
                 }
                 Disguise disguise = new Disguise(MobType.getMobType(mobtype), null);
                 /* Listener notify start */

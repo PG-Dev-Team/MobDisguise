@@ -1,9 +1,11 @@
 package me.desmin88.mobdisguise.listeners;
 
 import me.desmin88.mobdisguise.MobDisguise;
+import me.desmin88.mobdisguise.api.MobDisguiseAPI;
 import me.desmin88.mobdisguise.utils.DisguiseTask;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerAnimationEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerFishEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -38,6 +41,7 @@ public class MDPlayerListener implements Listener {
     public void onPlayerFish(PlayerFishEvent event) {
     	if (MobDisguise.disList.contains(event.getPlayer().getName())) {
     		event.setCancelled(true);
+    		event.getPlayer().sendMessage(MobDisguise.pref + "You cannot fish while disguised.");
     	}
     }
     
@@ -67,7 +71,7 @@ public class MDPlayerListener implements Listener {
     public void onPlayerBedEnter(PlayerBedEnterEvent event) {
         if (MobDisguise.disList.contains(event.getPlayer().getName())) {
             event.setCancelled(true);
-            return;
+            event.getPlayer().sendMessage(MobDisguise.pref + "You cannot sleep while disguised.");
         }
     }
 
@@ -79,8 +83,7 @@ public class MDPlayerListener implements Listener {
         }
         if (!MobDisguise.disList.contains(event.getPlayer().getName())) {
             Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new DisguiseTask(plugin), 8);
-        }
-        if (MobDisguise.disList.contains(event.getPlayer().getName())) {
+        } else {
             Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new DisguiseTask(plugin), 8);
         }
     }
@@ -90,8 +93,7 @@ public class MDPlayerListener implements Listener {
 
         if (!MobDisguise.disList.contains(event.getPlayer().getName())) {
             Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new DisguiseTask(plugin), 8);
-        }
-        if (MobDisguise.disList.contains(event.getPlayer().getName())) {
+        } else {
             if (!MobDisguise.apiList.contains(event.getPlayer().getName())) {
                 event.getPlayer().sendMessage(MobDisguise.pref + "You have been disguised because you died");
             }
@@ -108,10 +110,22 @@ public class MDPlayerListener implements Listener {
             if (!MobDisguise.apiList.contains(event.getPlayer().getName())) {
                 event.getPlayer().sendMessage(MobDisguise.pref + "You have been disguised because you relogged");
             }
-        }
-        if (!MobDisguise.disList.contains(event.getPlayer().getName())) {
+        } else {
             Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new DisguiseTask(plugin), 20);
         }
 
+    }
+    
+    @EventHandler
+    public void onPlayerWorldChange(PlayerChangedWorldEvent event) {
+    	if (MobDisguise.disList.contains(event.getPlayer().getName())) {
+    		if (!event.getPlayer().hasPermission("mobdisguise." + MobDisguise.playerMobDis.get(event.getPlayer().getName()).mob.toString())) {
+    			MobDisguiseAPI.undisguisePlayer(event.getPlayer());
+    		}
+    	} else if (MobDisguise.p2p.containsKey(event.getPlayer().getName())) {
+    		if (!event.getPlayer().hasPermission("mobdisguise.player")) {
+    			MobDisguiseAPI.undisguisePlayerAsPlayer(event.getPlayer(), null);
+    		}
+    	}
     }
 }

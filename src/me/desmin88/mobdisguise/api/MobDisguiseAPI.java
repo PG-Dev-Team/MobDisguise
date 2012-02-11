@@ -153,6 +153,18 @@ public class MobDisguiseAPI {
     public static boolean isDisguised(Player p) {
         return MobDisguise.disList.contains(p.getName());
     }
+    
+    /**
+     * Returns a player's disguise
+     * 
+     * @param p
+     *            Player
+     * 
+     * @return The disguise.
+     */
+    public static Disguise getDisguise(Player p) {
+    	return MobDisguise.playerMobDis.get(p.getName());
+    }
 
     /**
      * Gets a Player's DataWatcher

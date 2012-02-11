@@ -5,14 +5,18 @@ authors: [desmin88]
 commands:
     md:
         description: Allows player to disguise as mob
-        usage: /md [mobtype], stats, types, baby
+        usage: /md [mobtype], stats, types, baby, show
 permissions:
     mobdisguise.*:
-        description: Allows a player to disguise as any player or mob
+        description: Grants all mobdisguise privileges
         default: op
         children:
+            mobdisguise.show: true
             mobdisguise.player: true
             mobdisguise.mob.*: true
+    mobdisguise.show:
+        description: Allows a player to see other players undisguised
+        default: op
     mobdisguise.player:
         description: Allows a player to disguise as any player
         default: op
